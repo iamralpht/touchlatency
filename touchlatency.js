@@ -25,6 +25,7 @@ var trackingId = -1;
 var calibrationPoints = [];
 var circle = null;
 var nudgeTime = 0;
+var transformStyleName = 'transform';
 
 var domState = null;
 var domErrors = null;
@@ -35,6 +36,11 @@ var domProjectedPoint = null;
 domTouchPoint = document.createElement('div');
 domTouchPoint.className = 'touchpoint';
 document.body.appendChild(domTouchPoint);
+
+// Ensure we're using the correct style property for transform. Most WK
+// and Moz use unprefixed transform, apparently Chrome is still prefixed.
+if (domTouchPoint.style[transformStyleName] == undefined)
+    transformStyleName = '-webkit-transform';
 
 domProjectedPoint = document.createElement('div');
 domProjectedPoint.className = 'touchpoint projected';
@@ -67,7 +73,7 @@ document.body.addEventListener('touchmove',
         }
         if (!touchPoint) return;
 
-        domTouchPoint.style.webkitTransform = 'translate3D(' + (touchPoint.pageX-TOUCH_HALFSIZE) + 'px, '+ (touchPoint.pageY-TOUCH_HALFSIZE) + 'px, 0)';
+        domTouchPoint.style[transformStyleName] = 'translate3D(' + (touchPoint.pageX-TOUCH_HALFSIZE) + 'px, '+ (touchPoint.pageY-TOUCH_HALFSIZE) + 'px, 0)';
 
         switch (state) {
         case STATE_UNCALIBRATED:
@@ -217,7 +223,7 @@ function updateProjection(timeStamp, x, y) {
     ax = circle.cx + circle.r * Math.sin(angle);
     ay = circle.cy + circle.r * Math.cos(angle);
 
-    domProjectedPoint.style.webkitTransform = 'translate3D(' + (ax - TOUCH_HALFSIZE) + 'px, ' + (ay - TOUCH_HALFSIZE) + 'px, 0)';
+    domProjectedPoint.style[transformStyleName] = 'translate3D(' + (ax - TOUCH_HALFSIZE) + 'px, ' + (ay - TOUCH_HALFSIZE) + 'px, 0)';
 }
 function moveNudge(amount) {
     nudgeTime += amount;
