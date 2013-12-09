@@ -31,6 +31,7 @@ var domState = null;
 var domErrors = null;
 var domTouchPoint = null;
 var domCircle = null;
+var domVelocityGuide = null;
 var domProjectedPoint = null;
 
 domTouchPoint = document.createElement('div');
@@ -190,21 +191,35 @@ function calibrate() {
     }
     circle.time = (qTime + tqTime) / 2.0;
     //
-    // Now make a circle DOM element.
+    // Now make a circle DOM element and a guide to show how fast to move,
+    // if you're not using a robot.
     //
     if (domCircle) document.body.removeChild(domCircle);
     domCircle = document.createElement('div');
     domCircle.className = 'circle';
-    domCircle.style.width = 2 * r + 'px';
-    domCircle.style.height = 2 * r + 'px';
-    domCircle.style.borderRadius = (r*2) + 'px';
-    domCircle.style.left = (px - r) + 'px';
-    domCircle.style.top = (py - r) + 'px';
+    if (domVelocityGuide) document.body.removeChild(domVelocityGuide);
+    domVelocityGuide = document.createElement('div');
+    domVelocityGuide.className = 'guide';
+
+    domVelocityGuide.style.width = domCircle.style.width = 2 * r + 'px';
+    domVelocityGuide.style.height = domCircle.style.height = 2 * r + 'px';
+    domVelocityGuide.style.borderRadius = domCircle.style.borderRadius = (r*2) + 'px';
+    domVelocityGuide.style.left = domCircle.style.left = (px - r) + 'px';
+    domVelocityGuide.style.top = domCircle.style.top = (py - r) + 'px';
+    domVelocityGuide.style.borderTopLeftRadius = '0px'
+    var anim = 'spin ' + circle.time + 'ms linear infinite';
+    if (domVelocityGuide.style.animation !== undefined)
+        domVelocityGuide.style.animation = anim;
+    else
+        domVelocityGuide.style.webkitAnimation = anim;
     document.body.appendChild(domCircle);
+    document.body.appendChild(domVelocityGuide);
+
 
     state = STATE_CALIBRATED;
     domState.textContent = STATE_CALIBRATED;
 }
+
 function updateProjection(timeStamp, x, y) {
     if (!circle) return;
     var vx = x - circle.cx;
@@ -215,6 +230,7 @@ function updateProjection(timeStamp, x, y) {
     // [ax, ay] is the nearest point to the touchpoint which is on the circle.
 
     var angle = Math.atan2(ax - circle.cx, ay - circle.cy);
+
     // Now apply the nudge. The nudge is measured in milliseconds.
     var velocity = (Math.PI * 2.0) / circle.time;
     var nudgeAngleDelta = velocity * nudgeTime;

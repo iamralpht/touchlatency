@@ -10,6 +10,11 @@ body { margin: 0; padding: 0; }
     pointer-events: none;
     background-color: rgba(0, 0, 255, 0.3);
 }
+.guide { 
+    position: absolute;
+    pointer-events: none;
+    border: 4px dashed blue;
+}
 .touchpoint {
     position: absolute;
     width: 20px; height: 20px;
@@ -37,6 +42,18 @@ body { margin: 0; padding: 0; }
 .inc-nudge::after { content: 'nudge +5ms'; }
 .dec-nudge { right: 0; bottom: 0; }
 .dec-nudge::after { content: 'nudge -5ms'; }
+
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    50% { -webkit-transform: rotate(180deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+/*
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+*/
 </style>
 </head>
 <body>
